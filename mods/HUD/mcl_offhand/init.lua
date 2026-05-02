@@ -181,7 +181,7 @@ end)
 minetest.register_on_player_inventory_action(function(player, action, inventory, inventory_info)
 	local from_offhand = inventory_info.from_list == "offhand"
 	local to_offhand = inventory_info.to_list == "offhand"
-	if action == "move" and from_offhand or to_offhand then
+	if from_offhand or to_offhand then
 		mcl_inventory.update_inventory_formspec(player)
 	end
 end)

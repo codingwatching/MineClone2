@@ -141,6 +141,8 @@ local main_page_static = table.concat({
 	"listring[current_player;distr]",
 	"listring[current_player;armor]",
 	"listring[current_player;main]",
+	"listring[current_player;offhand]",
+	"listring[current_player;main]",
 })
 
 mcl_inventory.register_survival_inventory_tab({
@@ -247,6 +249,11 @@ core.register_allow_player_inventory_action(function (player, action, inventory,
 		return lim
 	end
 
+	if inventory:get_stack("offhand", 1):is_empty()
+			and core.get_item_group(fit_stack:get_name(), "offhand_item") > 0 then
+		return fit_stack:get_count()
+	end
+
 	-- If stack can fit as a whole
 	if inventory:room_for_item("craft", fit_stack) then
 		return fit_stack:get_count()
@@ -279,10 +286,40 @@ core.register_on_player_inventory_action(function(player, action, inventory, inv
 		return
 	end
 
+	if inventory:get_stack("offhand", 1):is_empty()
+			and core.get_item_group(stack:get_name(), "offhand_item") > 0 then
+		inventory:set_stack("offhand", 1, stack)
+		inventory:set_stack("distr", 1, nil)
+		mcl_inventory.update_inventory_formspec(player)
+		return
+	end
+
 	local leftover = inventory:add_item("craft", stack)
 	if not leftover:is_empty() then
 		core.add_item(player:get_pos(), leftover)
-		core.log("warning", "Distribution overflow! If repeats - report a bug!")
+		core.log("warning", "Distribution overflow! Player: " .. player:get_player_name()
+			.. ";\n leftover: " .. leftover:get_name() .. " " .. leftover:get_count()
+			.. ";\n offhand: " .. inventory:get_stack("offhand", 1):get_name()
+			.. " " .. inventory:get_stack("offhand", 1):get_count()
+
+			.. ";\n armor1 : " .. inventory:get_stack("armor", 1):get_name()
+			.. " " .. inventory:get_stack("armor", 1):get_count()
+			.. ";\n armor2 : " .. inventory:get_stack("armor", 2):get_name()
+			.. " " .. inventory:get_stack("armor", 2):get_count()
+			.. ";\n armor3 : " .. inventory:get_stack("armor", 3):get_name()
+			.. " " .. inventory:get_stack("armor", 3):get_count()
+			.. ";\n armor4 : " .. inventory:get_stack("armor", 4):get_name()
+			.. " " .. inventory:get_stack("armor", 4):get_count()
+
+			.. ";\n craft1 : " .. inventory:get_stack("craft", 1):get_name()
+			.. " " .. inventory:get_stack("craft", 1):get_count()
+			.. ";\n craft2 : " .. inventory:get_stack("craft", 2):get_name()
+			.. " " .. inventory:get_stack("craft", 2):get_count()
+			.. ";\n craft3 : " .. inventory:get_stack("craft", 3):get_name()
+			.. " " .. inventory:get_stack("craft", 3):get_count()
+			.. ";\n craft4 : " .. inventory:get_stack("craft", 4):get_name()
+			.. " " .. inventory:get_stack("craft", 4):get_count()
+		)
 	end
 	inventory:set_stack("distr", 1, nil)
 end)
