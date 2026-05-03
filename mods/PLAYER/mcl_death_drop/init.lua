@@ -51,6 +51,7 @@ minetest.register_on_dieplayer(function(player)
 					for _, on_death_drop in ipairs(mcl_death_drop.on_death_drop_per_stack) do
 						if on_death_drop ~= nil and on_death_drop(player, inv, listname, i, stack) then
 							was_handled = true
+							break
 						end
 					end
 					if not was_handled then
